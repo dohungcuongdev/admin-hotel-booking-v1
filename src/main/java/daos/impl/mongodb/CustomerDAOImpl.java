@@ -38,10 +38,10 @@ import statics.helper.DateTimeCalculator;
 public class CustomerDAOImpl extends JsonParserDAO implements CustomerDAO {
 
 	@Autowired
-	private ActivityDAO activityDAO = new ActivityDAOImpl();
+	private ActivityDAO activityDAO;
 
 	@Autowired
-	private TrackingDAO userDAO = new TrackingDAOImpl();
+	private TrackingDAO userDAO;
 	
 	private DBCollection collection;    
 	

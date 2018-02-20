@@ -21,20 +21,21 @@ import model.sql.user.Administrator;
 public class AppData {
 
 	// local
-	public static final String SPRING_APP_URL = "http://localhost:8080/Hotel-booking-and-reservations-system-admin/";
-
-	// online
-	//public static final String SPRING_APP_URL = "https://admin-hotel-booking.herokuapp.com/";
+	//public static final String SPRING_APP_URL = "http://localhost:8080/Hotel-booking-and-reservations-system-admin/";
 
 	// for using mongodb with Spring instead of using Hibernate + SQL 
 	//local
-	public static final String DATABASE = "HotelBookingReservationsSystem";
-	public static final String DATABASE_HOST = "localhost";
-	public static final int DATABASE_PORT = 27017;
+//	public static final String DATABASE = "HotelBookingReservationsSystem";
+//	public static final String DATABASE_HOST = "localhost";
+//	public static final int DATABASE_PORT = 27017;
+//	public static final String MONGGO_URL = "mongodb://" + AppData.DATABASE_HOST + ":" + AppData.DATABASE_PORT;
+
+	// online
+	public static final String SPRING_APP_URL = "https://admin-hotel-booking.herokuapp.com/";
 	
 	//online
-//	public static final String DATABASE = "hotel_booking_system";
-//	public static final String MONGGO_URL = "mongodb://dohungcuongdev:ititiu13170@ds157057.mlab.com:57057/" + DATABASE;
+	public static final String DATABASE = "hotel_booking_system";
+	public static final String MONGGO_URL = "mongodb://dohungcuongdev:ititiu13170@ds157057.mlab.com:57057/" + DATABASE;
 			
 	public static final String EMAIL = "cuongvip1295@gmail.com";
 	public static final String AUTHENTICATION = "ititiu13170";
