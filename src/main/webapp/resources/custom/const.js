@@ -14,9 +14,13 @@
 //const SPRING_API_URL = "http://localhost:8080/Hotel-booking-and-reservations-system-admin/api/";
 //var MEAN_URL = "http://localhost:3000/";
 
-//online
-const SPRING_API_URL = "https://admin-hotel-booking.herokuapp.com/api/";
-var MEAN_URL = 'https://hotel-booking-and-reservations.herokuapp.com/';
+//online v2
+//const SPRING_API_URL = "https://admin-hotel-booking.herokuapp.com/api/";
+//const MEAN_URL = 'https://hotel-booking-and-reservations.herokuapp.com/';
+
+//online v1
+const SPRING_API_URL = "https://admin-hotel-booking-v1.herokuapp.com/api/";
+const MEAN_URL = 'https://hotel-booking-system-v1.herokuapp.com/'
 
 const MEAN_API_URL = MEAN_URL + "api/";
 const TRACKING_API_URL = MEAN_API_URL + "follow-users/";
