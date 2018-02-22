@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package daos.impl.sql;
+package sql.daoimpls;
 
 import static statics.helper.MathCalculator.round;
 
@@ -30,7 +30,7 @@ import statics.constant.AppData;
  * @author Do Hung Cuong
  */
 
-//@Repository
+@Repository
 public class CustomerDAOImpl extends APIDAO implements CustomerDAO {
 
 	@Autowired

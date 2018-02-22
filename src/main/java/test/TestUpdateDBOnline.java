@@ -13,10 +13,10 @@ import com.mongodb.MongoClientURI;
 
 import daos.RestaurantDAO;
 import daos.RoomDAO;
-import daos.impl.mongodb.JsonParserDAO;
-import daos.impl.mongodb.RestaurantDAOImpl;
-import daos.impl.mongodb.RoomDAOImpl;
-import daos.impl.mongodb.TrackingDAOImpl;
+import mongodb.daoimpls.JsonParserDAO;
+import mongodb.daoimpls.RestaurantDAOImpl;
+import mongodb.daoimpls.RoomDAOImpl;
+import mongodb.daoimpls.TrackingDAOImpl;
 import model.api.user.tracking.FollowUsers;
 import model.mongodb.user.tracking.Activity;
 import model.sql.hotel.HotelRoom;

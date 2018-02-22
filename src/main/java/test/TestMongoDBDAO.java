@@ -3,11 +3,11 @@ package test;
 import java.net.UnknownHostException;
 import java.util.List;
 
-import daos.impl.mongodb.ActivityDAOImpl;
-import daos.impl.mongodb.CustomerDAOImpl;
-import daos.impl.mongodb.RestaurantDAOImpl;
-import daos.impl.mongodb.RoomDAOImpl;
-import daos.impl.mongodb.TrackingDAOImpl;
+import mongodb.daoimpls.ActivityDAOImpl;
+import mongodb.daoimpls.CustomerDAOImpl;
+import mongodb.daoimpls.RestaurantDAOImpl;
+import mongodb.daoimpls.RoomDAOImpl;
+import mongodb.daoimpls.TrackingDAOImpl;
 import daos.ActivityDAO;
 import daos.CustomerDAO;
 import daos.RestaurantDAO;
