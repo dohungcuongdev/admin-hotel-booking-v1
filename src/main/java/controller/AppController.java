@@ -38,6 +38,7 @@ import services.ApplicationService;
 import services.HotelItemService;
 import services.UserService;
 import statics.constant.AppData;
+import test.TestSQLDAO;
 
 /**
  *
@@ -620,5 +621,15 @@ public class AppController {
 	@SuppressWarnings("unused")
 	private void addNewAdmin() {
 		
+	}	
+	
+	@Autowired
+	TestSQLDAO testSQLDAO;
+
+	@RequestMapping(value = "testSQLDAO", method = RequestMethod.GET)
+	public String testSQLDAO(ModelMap model) {
+		Object obj = testSQLDAO.runTestAndGetData();
+		model.addAttribute("testSQLData", obj);
+		return "testSQLDAO";
 	}
 }
