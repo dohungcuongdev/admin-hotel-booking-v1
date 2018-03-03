@@ -9,3 +9,6 @@ Deploy war on heroku (https://dashboard.heroku.com/apps/admin-hotel-booking-v1/d
 
 Deploy project on heroku
 https://devcenter.heroku.com/articles/java-webapp-runner
+
+email-authentication:
+https://accounts.google.com/displayunlockcaptcha
