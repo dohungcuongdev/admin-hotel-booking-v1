@@ -58,13 +58,37 @@ public class AppController {
 	@Autowired
 	private ApplicationService appService;
 	
+	//block-user
+	@RequestMapping(value = "block-user/{username}")
+	public String blockUser(@PathVariable(value = "username") String username, ModelMap model, HttpServletRequest request, HttpServletResponse response) {
+		checkAuth(request, response);
+		userService.blockUser(username);
+		model.put("configUserResult", "User was blocked successfully");
+		initialize(model);
+		model.put("cusDataCollection", userService.getDataCollection());
+		return "manage-users";
+	}
+	
+	//unblock-user
+	@RequestMapping(value = "unblock-user/{username}")
+	public String unblockUser(@PathVariable(value = "username") String username, ModelMap model, HttpServletRequest request, HttpServletResponse response) {
+		checkAuth(request, response);
+		userService.unblockUser(username);
+		model.put("configUserResult", "User was unblocked successfully");
+		initialize(model);
+		model.put("cusDataCollection", userService.getDataCollection());
+		return "manage-users";
+	}
+
+	// forget-password
 	@RequestMapping(value = "forget-password/{email}")
 	public String forgetPassword(@PathVariable(value = "email") String email, HttpServletResponse response) {
-		if(userService.isExists(email)) {
+		if (userService.isExists(email)) {
 			String newPassword = appService.getPasswordGenerated();
 			String newEncryptedPW = appService.getEncryptPassword(newPassword);
 			userService.updatePassword(email, newEncryptedPW);
-			appService.sendHTMLEmail(AppData.FORGET_PW_HEADER_EMAIL + newPassword + "</b> at " + new Date() + AppData.FORGET_PW_FOOTER_EMAIL, email, "Forget Password");
+			appService.sendHTMLEmail(AppData.FORGET_PW_HEADER_EMAIL + newPassword + "</b> at " + new Date()
+					+ AppData.FORGET_PW_FOOTER_EMAIL, email, "Forget Password");
 		}
 		return "login";
 	}
@@ -79,17 +103,19 @@ public class AppController {
 
 	// checklogin
 	@RequestMapping(value = "check-login", method = RequestMethod.POST)
-	public String checklogin(@ModelAttribute(value = "loginbean") LoginBean loginbean, HttpServletRequest request, HttpServletResponse response, ModelMap model) throws IOException {
+	public String checklogin(@ModelAttribute(value = "loginbean") LoginBean loginbean, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) throws IOException {
 		String username = loginbean.getUserName();
 		String password = loginbean.getPassword();
 		AppData.admin = userService.getAdminByUserName(username);
-		if (AppData.admin != null && username.equals(AppData.admin.getUsername()) && password.equals(appService.getDecryptPassword(AppData.admin.getPassword()))) {
+		if (AppData.admin != null && username.equals(AppData.admin.getUsername())
+				&& password.equals(appService.getDecryptPassword(AppData.admin.getPassword()))) {
 			request.getSession().setAttribute("username", username);
 			request.getSession().setMaxInactiveInterval(24 * 60 * 60);
 			Cookie cookieUN = new Cookie("username", username);
 			Cookie cookiePW = new Cookie("password", appService.getEncryptPassword(password));
-			cookieUN.setMaxAge(3600*24*3);
-			cookiePW.setMaxAge(3600*24*3);
+			cookieUN.setMaxAge(3600 * 24 * 3);
+			cookiePW.setMaxAge(3600 * 24 * 3);
 			response.addCookie(cookieUN);
 			response.addCookie(cookiePW);
 			return index(request, response, model);
@@ -112,7 +138,8 @@ public class AppController {
 	}
 
 	@RequestMapping(value = "search-result/{keyword}", method = RequestMethod.GET)
-	public String searchResult(@PathVariable(value = "keyword") String keyword, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String searchResult(@PathVariable(value = "keyword") String keyword, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		initialize(model);
 		model.put("cusDataCollection", userService.getDataCollection());
@@ -128,7 +155,8 @@ public class AppController {
 
 	// profile
 	@RequestMapping(value = "change-password", method = RequestMethod.POST)
-	public String changePassword(@ModelAttribute(value = "changePassBean") ChangePasswordBean changePassBean, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String changePassword(@ModelAttribute(value = "changePassBean") ChangePasswordBean changePassBean,
+			HttpServletRequest request, HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		String correctPassword = appService.getDecryptPassword(AppData.admin.getPassword());
 		String newPassword = changePassBean.getNewpassword();
@@ -142,7 +170,8 @@ public class AppController {
 	}
 
 	@RequestMapping(value = "profile-edited", method = RequestMethod.POST)
-	public String editProfile(@ModelAttribute(value = "adminEdit") Administrator ad, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String editProfile(@ModelAttribute(value = "adminEdit") Administrator ad, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		if (ad.isEnoughInfor()) {
 			userService.updateAdmin(ad);
@@ -155,7 +184,8 @@ public class AppController {
 	}
 
 	@RequestMapping(value = "profile-img-edited", method = RequestMethod.POST)
-	public String profileImgEdited(@RequestParam(value = "img") CommonsMultipartFile img, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String profileImgEdited(@RequestParam(value = "img") CommonsMultipartFile img, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		userService.editProfileImg(AppData.admin.getUsername(), appService.uploadImage(img, request, model, "users"));
 		AppData.admin = userService.getAdminByUserName(AppData.admin.getUsername());
@@ -163,19 +193,21 @@ public class AppController {
 	}
 
 	// rooms
-	@RequestMapping(value = {"manage-rooms", "room", "rooms"}, method = RequestMethod.GET)
+	@RequestMapping(value = { "manage-rooms", "room", "rooms" }, method = RequestMethod.GET)
 	public String manageRooms(HttpServletRequest request, HttpServletResponse response, ModelMap model) {
 		return authInitializeRedirect(request, response, model, "manage-rooms");
 	}
 
 	@RequestMapping(value = "room/{roomName}", method = RequestMethod.GET)
-	public String singleRoom(@PathVariable(value = "roomName") String roomName, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String singleRoom(@PathVariable(value = "roomName") String roomName, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		return initializeSingleRoom(model, roomName, "room");
 	}
 
 	@RequestMapping(value = "edit-room/{roomName}", method = RequestMethod.GET)
-	public String editRoom(@PathVariable(value = "roomName") String roomName, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String editRoom(@PathVariable(value = "roomName") String roomName, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		model.addAttribute("roomEdit", new HotelRoom());
 		return initializeSingleRoom(model, roomName, "edit-room");
@@ -188,7 +220,8 @@ public class AppController {
 	}
 
 	@RequestMapping(value = "room-added", method = RequestMethod.POST)
-	public String roomAdded(@ModelAttribute(value = "newRoom") HotelRoom newRoom, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String roomAdded(@ModelAttribute(value = "newRoom") HotelRoom newRoom, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		String newRoomName;
 		initialize(model);
@@ -200,7 +233,7 @@ public class AppController {
 			model.put("room", newRoom);
 			model.put("relatedRoom", hotelItemService.getRelatedHotelRooms(newRoom.getType()));
 			newRoomName = hotelItemService.findAndAddNewRoom(newRoom);
-			//AppData.listrooms = hotelItemService.getAllRooms();
+			// AppData.listrooms = hotelItemService.getAllRooms();
 		} else {
 			model.addAttribute("newRoom", new HotelRoom());
 			return "add-room";
@@ -209,7 +242,8 @@ public class AppController {
 	}
 
 	@RequestMapping(value = "room-edited", method = RequestMethod.POST)
-	public String roomEdited(@ModelAttribute(value = "roomEdit") HotelRoom roomEdit, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String roomEdited(@ModelAttribute(value = "roomEdit") HotelRoom roomEdit, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		roomEdit.initializeSomeInfor();
 		initialize(model);
@@ -219,7 +253,7 @@ public class AppController {
 			hotelItemService.updateRoom(roomEdit);
 			model.put("room", roomEdit);
 			model.put("relatedRoom", hotelItemService.getRelatedHotelRooms(roomEdit.getType()));
-			//AppData.listrooms = hotelItemService.getAllRooms();
+			// AppData.listrooms = hotelItemService.getAllRooms();
 		} else {
 			return initializeSingleRoom(model, roomEdit.getName(), "edit-room");
 		}
@@ -227,31 +261,36 @@ public class AppController {
 	}
 
 	@RequestMapping(value = "remove-room/{id}", method = RequestMethod.GET)
-	public String removeRoom(@PathVariable(value = "id") int id, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String removeRoom(@PathVariable(value = "id") int id, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		hotelItemService.deleteRoom(id);
 		model.put("deleteResult", AppData.ABLE_TO_EDIT);
-		//AppData.listrooms = hotelItemService.getAllRooms();
+		// AppData.listrooms = hotelItemService.getAllRooms();
 		return manageRooms(request, response, model);
 	}
 
 	@RequestMapping(value = "room-img-edited/{roomName}", method = RequestMethod.POST)
-	public String roomImgEdited(@RequestParam(value = "img1") CommonsMultipartFile img1, @RequestParam(value = "img2") CommonsMultipartFile img2, @PathVariable(value = "roomName") String roomName, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String roomImgEdited(@RequestParam(value = "img1") CommonsMultipartFile img1,
+			@RequestParam(value = "img2") CommonsMultipartFile img2, @PathVariable(value = "roomName") String roomName,
+			HttpServletRequest request, HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		model.addAttribute("roomEdit", new HotelRoom());
-		hotelItemService.editImageRoom(roomName, appService.uploadImage(img1, request, model, "rooms"), appService.uploadImage(img2, request, model, "rooms"));
-		//AppData.listrooms = hotelItemService.getAllRooms();
+		hotelItemService.editImageRoom(roomName, appService.uploadImage(img1, request, model, "rooms"),
+				appService.uploadImage(img2, request, model, "rooms"));
+		// AppData.listrooms = hotelItemService.getAllRooms();
 		return initializeSingleRoom(model, roomName, "edit-room");
 	}
 
 	// restaurant
-	@RequestMapping(value = {"manage-restaurant", "service", "services"}, method = RequestMethod.GET)
+	@RequestMapping(value = { "manage-restaurant", "service", "services" }, method = RequestMethod.GET)
 	public String manageRestaurant(HttpServletRequest request, HttpServletResponse response, ModelMap model) {
 		return authInitializeRedirect(request, response, model, "manage-restaurant");
 	}
 
 	@RequestMapping(value = "service/{servicename}", method = RequestMethod.GET)
-	public String singleService(@PathVariable(value = "servicename") String servicename, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String singleService(@PathVariable(value = "servicename") String servicename, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		return initializeSingleService(model, servicename, "service");
 	}
@@ -263,7 +302,8 @@ public class AppController {
 	}
 
 	@RequestMapping(value = "service-added", method = RequestMethod.POST)
-	public String serviceAdded(@ModelAttribute(value = "newService") HotelService newService, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String serviceAdded(@ModelAttribute(value = "newService") HotelService newService,
+			HttpServletRequest request, HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		String newServiceName;
 		initialize(model);
@@ -275,7 +315,7 @@ public class AppController {
 			model.put("service", newService);
 			model.put("relatedRoom", hotelItemService.getRelatedHotelServices(newService.getType()));
 			newServiceName = hotelItemService.findAndAddNewService(newService);
-			//AppData.listservices = hotelItemService.getAllHotelServices();
+			// AppData.listservices = hotelItemService.getAllHotelServices();
 		} else {
 			model.addAttribute("newService", new HotelService());
 			return "add-service";
@@ -284,13 +324,15 @@ public class AppController {
 	}
 
 	@RequestMapping(value = "edit-service/{servicename}", method = RequestMethod.GET)
-	public String editService(@PathVariable(value = "servicename") String servicename, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String editService(@PathVariable(value = "servicename") String servicename, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		model.addAttribute("serviceEdit", new HotelService());
 		return initializeSingleService(model, servicename, "edit-service");
 	}
 
 	@RequestMapping(value = "service-edited", method = RequestMethod.POST)
-	public String serviceEdited(@ModelAttribute(value = "serviceEdit") HotelService serviceEdit, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String serviceEdited(@ModelAttribute(value = "serviceEdit") HotelService serviceEdit,
+			HttpServletRequest request, HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		serviceEdit.initializeSomeInfor();
 		initialize(model);
@@ -300,7 +342,7 @@ public class AppController {
 			hotelItemService.updateService(serviceEdit);
 			model.put("service", serviceEdit);
 			model.put("relatedServices", hotelItemService.getRelatedHotelServices(serviceEdit.getType()));
-			//AppData.listservices = hotelItemService.getAllHotelServices();
+			// AppData.listservices = hotelItemService.getAllHotelServices();
 		} else {
 			return initializeSingleService(model, serviceEdit.getName(), "edit-service");
 		}
@@ -308,18 +350,23 @@ public class AppController {
 	}
 
 	@RequestMapping(value = "remove-service/{id}", method = RequestMethod.GET)
-	public String removeService(@PathVariable(value = "id") int id, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String removeService(@PathVariable(value = "id") int id, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		hotelItemService.deleteService(id);
 		model.put("deleteResult", AppData.ABLE_TO_EDIT);
-		//AppData.listservices = hotelItemService.getAllHotelServices();
+		// AppData.listservices = hotelItemService.getAllHotelServices();
 		return manageRestaurant(request, response, model);
 	}
 
 	@RequestMapping(value = "service-img-edited/{servicename}", method = RequestMethod.POST)
-	public String serviceImgEdited(@RequestParam(value = "img1") CommonsMultipartFile img1, @RequestParam(value = "img2") CommonsMultipartFile img2, @PathVariable(value = "servicename") String servicename, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String serviceImgEdited(@RequestParam(value = "img1") CommonsMultipartFile img1,
+			@RequestParam(value = "img2") CommonsMultipartFile img2,
+			@PathVariable(value = "servicename") String servicename, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		model.addAttribute("serviceEdit", new HotelService());
-		hotelItemService.editImageService(servicename, appService.uploadImage(img1, request, model, "restaurant"), appService.uploadImage(img2, request, model, "restaurant"));
-		//AppData.listservices = hotelItemService.getAllHotelServices();
+		hotelItemService.editImageService(servicename, appService.uploadImage(img1, request, model, "restaurant"),
+				appService.uploadImage(img2, request, model, "restaurant"));
+		// AppData.listservices = hotelItemService.getAllHotelServices();
 		return initializeSingleService(model, servicename, "edit-service");
 	}
 
@@ -331,12 +378,12 @@ public class AppController {
 		model.put("cusDataCollection", userService.getDataCollection());
 		return "manage-users";
 	}
-	
+
 	@RequestMapping(value = "follow-all-users", method = RequestMethod.GET)
 	public String followAllUsers(HttpServletRequest request, HttpServletResponse response, ModelMap model) {
 		return authInitializeRedirect(request, response, model, "follow-all-users");
 	}
-	
+
 	@RequestMapping(value = "follow-users", method = RequestMethod.GET)
 	public String followUsers(HttpServletRequest request, HttpServletResponse response, ModelMap model) {
 		model.put("fieldname", "created_at");
@@ -344,21 +391,27 @@ public class AppController {
 		model.put("page", 1);
 		return authInitializeRedirect(request, response, model, "follow-users");
 	}
-	
+
 	@RequestMapping(value = "follow-users/{page}", method = RequestMethod.GET)
-	public String followUsersPage(@PathVariable(value = "page") int page, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String followUsersPage(@PathVariable(value = "page") int page, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		model.put("fieldname", "created_at");
 		model.put("sort", "des");
 		return authInitializeRedirect(request, response, model, "follow-users");
 	}
-	
+
 	@RequestMapping(value = "follow-users/{fieldname}/{sort}/{page}", method = RequestMethod.GET)
-	public String followUsersPageSorted(@PathVariable(value = "fieldname") String fieldname, @PathVariable(value = "sort") String sort, @PathVariable(value = "page") int page, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String followUsersPageSorted(@PathVariable(value = "fieldname") String fieldname,
+			@PathVariable(value = "sort") String sort, @PathVariable(value = "page") int page,
+			HttpServletRequest request, HttpServletResponse response, ModelMap model) {
 		return authInitializeRedirect(request, response, model, "follow-users");
 	}
-	
+
 	@RequestMapping(value = "follow-users-search/{fieldname}/{keyword}/{sort}/{page}", method = RequestMethod.GET)
-	public String searchFollowUsers(@PathVariable(value = "fieldname") String fieldname, @PathVariable(value = "keyword") String keyword, @PathVariable(value = "sort") String sort, @PathVariable(value = "page") int page, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String searchFollowUsers(@PathVariable(value = "fieldname") String fieldname,
+			@PathVariable(value = "keyword") String keyword, @PathVariable(value = "sort") String sort,
+			@PathVariable(value = "page") int page, HttpServletRequest request, HttpServletResponse response,
+			ModelMap model) {
 		return authInitializeRedirect(request, response, model, "follow-users");
 	}
 
@@ -376,7 +429,7 @@ public class AppController {
 	public String trackingMemebers(HttpServletRequest request, HttpServletResponse response, ModelMap model) {
 		return initializeTracking("Username", request, response, model);
 	}
-	
+
 	@RequestMapping(value = "tracking-page-access", method = RequestMethod.GET)
 	public String pageAccessStatistics(HttpServletRequest request, HttpServletResponse response, ModelMap model) {
 		return initializeTracking("PageAccess", request, response, model);
@@ -387,36 +440,41 @@ public class AppController {
 		return authInitializeRedirect(request, response, model, "country-chart");
 	}
 
-	@RequestMapping(value = {"page-access-chart", "PageAccess/**"}, method = RequestMethod.GET)
+	@RequestMapping(value = { "page-access-chart", "PageAccess/**" }, method = RequestMethod.GET)
 	public String pageAccessChart(HttpServletRequest request, HttpServletResponse response, ModelMap model) {
 		model.put("ipaddress", "All IP address");
 		return authInitializeRedirect(request, response, model, "page-access-chart");
 	}
 
-	@RequestMapping(value = {"member-chart/{username}","Username/{username}"}, method = RequestMethod.GET)
-	public String pageAccessMemberChart(@PathVariable(value = "username") String username, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	@RequestMapping(value = { "member-chart/{username}", "Username/{username}" }, method = RequestMethod.GET)
+	public String pageAccessMemberChart(@PathVariable(value = "username") String username, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		return authInitializeRedirect(request, response, model, "member-chart");
 	}
-	
-	@RequestMapping(value = {"page-access-chart/{ipaddress}", "UserIP/{ipaddress}"}, method = RequestMethod.GET)
-	public String pageAccessIPChart(@PathVariable(value = "ipaddress") String ipaddress, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+
+	@RequestMapping(value = { "page-access-chart/{ipaddress}", "UserIP/{ipaddress}" }, method = RequestMethod.GET)
+	public String pageAccessIPChart(@PathVariable(value = "ipaddress") String ipaddress, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		return authInitializeRedirect(request, response, model, "page-access-chart");
 	}
 
 	@RequestMapping(value = "click-tracking-ip/{trackingParam}", method = RequestMethod.GET)
-	public String followUsersIP(@PathVariable(value = "trackingParam") String ip, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
-		model.put("tracking","ip");
+	public String followUsersIP(@PathVariable(value = "trackingParam") String ip, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
+		model.put("tracking", "ip");
 		return authInitializeRedirect(request, response, model, "click-tracking");
 	}
-	
+
 	@RequestMapping(value = "click-tracking-member/{trackingParam}", method = RequestMethod.GET)
-	public String followMember(@PathVariable(value = "trackingParam") String username, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
-		model.put("tracking","member");
+	public String followMember(@PathVariable(value = "trackingParam") String username, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
+		model.put("tracking", "member");
 		return authInitializeRedirect(request, response, model, "click-tracking");
 	}
-	
-	@RequestMapping(value = {"ip-details/{externalip}", "ExternalIP/{externalip}"}, method = RequestMethod.GET)
-	public String ipDetails(@PathVariable(value = "externalip") String externalip, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+
+	@RequestMapping(value = { "ip-details/{externalip}", "ExternalIP/{externalip}" }, method = RequestMethod.GET)
+	public String ipDetails(@PathVariable(value = "externalip") String externalip, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		initialize(model);
 		model.put("ipDetails", appService.getLocationByIP(externalip));
@@ -434,7 +492,8 @@ public class AppController {
 	}
 
 	@RequestMapping(value = "user/{username}", method = RequestMethod.GET)
-	public String singleUser(@PathVariable(value = "username") String username, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String singleUser(@PathVariable(value = "username") String username, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		initialize(model);
 		Customer cus = userService.getCustomerByUsername(username);
@@ -444,7 +503,8 @@ public class AppController {
 	}
 
 	@RequestMapping(value = "customer/{username}", method = RequestMethod.GET)
-	public String singleCustomer(@PathVariable(value = "username") String username, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String singleCustomer(@PathVariable(value = "username") String username, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		initialize(model);
 		model.put("cusDataCollection", userService.getOneDataCollection(username));
 		return "customer";
@@ -452,12 +512,13 @@ public class AppController {
 
 	// message
 	@RequestMapping(value = "message", method = RequestMethod.GET)
-	public String message(HttpServletRequest request, HttpServletResponse response, ModelMap model)  {
+	public String message(HttpServletRequest request, HttpServletResponse response, ModelMap model) {
 		return authInitializeRedirect(request, response, model, "message");
 	}
 
 	@RequestMapping(value = "notification/{id}", method = RequestMethod.GET)
-	public String notification(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String notification(@PathVariable(value = "id") String id, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		userService.seenNotification(id);
 		model.put("activity", userService.getActivityBy(id));
@@ -467,7 +528,8 @@ public class AppController {
 	}
 
 	@RequestMapping(value = "reply Book Room/{id}", method = RequestMethod.GET)
-	public String replyBooking(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String replyBooking(@PathVariable(value = "id") String id, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		userService.seenNotification(id);
 		model.put("activity", userService.getActivityBy(id));
@@ -478,7 +540,8 @@ public class AppController {
 	}
 
 	@RequestMapping(value = "reply Cancel Room/{id}", method = RequestMethod.GET)
-	public String replyCancel(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String replyCancel(@PathVariable(value = "id") String id, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		model.put("activity", userService.seenNotification(id));
 		initialize(model);
@@ -486,7 +549,9 @@ public class AppController {
 	}
 
 	@RequestMapping(value = "send-mail", method = RequestMethod.POST)
-	public String sendMail(@RequestParam("activity-id") String id, @RequestParam("message") String message, @RequestParam("user-email") String useremail, @RequestParam("subject") String subject, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String sendMail(@RequestParam("activity-id") String id, @RequestParam("message") String message,
+			@RequestParam("user-email") String useremail, @RequestParam("subject") String subject,
+			HttpServletRequest request, HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		model.put("emailsent", appService.sendEmail(appService.removeAccent(message), useremail, subject));
 		model.put("emailTemplates", AppData.EMAIL_TEMPLATE_1);
@@ -500,9 +565,10 @@ public class AppController {
 	public String fqa(HttpServletRequest request, HttpServletResponse response, ModelMap model, String redirect) {
 		return authInitializeRedirect(request, response, model, "fqa");
 	}
-	
+
 	@RequestMapping(value = "upload-fqa", method = RequestMethod.POST)
-	public String uploadFQA(@RequestParam(value = "fqaPDF") CommonsMultipartFile fqaPDF, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	public String uploadFQA(@RequestParam(value = "fqaPDF") CommonsMultipartFile fqaPDF, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
 		checkAuth(request, response);
 		initialize(model);
 		appService.uploadPDF(fqaPDF, request, model);
@@ -536,9 +602,9 @@ public class AppController {
 			AppData.admin = userService.getAdminByUserName(username);
 		return (AppData.admin != null && AppData.admin.getUsername().equals(username)) ? true : false;
 	}
-	
+
 	private void checkAuth(HttpServletRequest request, HttpServletResponse response) {
-		if(!isAuthenticated(request)) {
+		if (!isAuthenticated(request)) {
 			try {
 				response.sendRedirect("login");
 			} catch (IOException e) {
@@ -546,8 +612,9 @@ public class AppController {
 			}
 		}
 	}
-	
-	private String authInitializeRedirect(HttpServletRequest request, HttpServletResponse response, ModelMap model, String redirect) {
+
+	private String authInitializeRedirect(HttpServletRequest request, HttpServletResponse response, ModelMap model,
+			String redirect) {
 		checkAuth(request, response);
 		initialize(model);
 		return redirect;
@@ -565,14 +632,14 @@ public class AppController {
 		model.put("listactivily", listactivily);
 		model.put("listrooms", listrooms);
 		model.put("listservices", listservices);
-		//model.put("listrooms", AppData.listrooms);
-		//model.put("listservices", AppData.listservices);
+		// model.put("listrooms", AppData.listrooms);
+		// model.put("listservices", AppData.listservices);
 		model.put("totalUsers", getX100SizeOfList(listusers));
 		model.put("totalMessage", getX100SizeOfList(listactivily));
 		model.put("totalRooms", getX100SizeOfList(listrooms));
 		model.put("totalServices", getX100SizeOfList(listservices));
-//		model.put("totalRooms", getX100SizeOfList(AppData.listrooms));
-//		model.put("totalServices", getX100SizeOfList(AppData.listservices));
+		// model.put("totalRooms", getX100SizeOfList(AppData.listrooms));
+		// model.put("totalServices", getX100SizeOfList(AppData.listservices));
 	}
 
 	private String initializeProfile(ModelMap model) {
@@ -597,18 +664,19 @@ public class AppController {
 		model.put("relatedServices", hotelItemService.getRelatedHotelServices(service.getType()));
 		return redirect;
 	}
-	
-	private String initializeTracking(String tracking, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+
+	private String initializeTracking(String tracking, HttpServletRequest request, HttpServletResponse response,
+			ModelMap model) {
 		model.put("tracking", tracking);
 		return authInitializeRedirect(request, response, model, "tracking-users");
 	}
-	
+
 	private int getX100SizeOfList(List<?> list) {
-		if(list == null)
+		if (list == null)
 			return 0;
-		return list.size()*100;
+		return list.size() * 100;
 	}
-	
+
 	@SuppressWarnings("unused")
 	private void updateEncryptedPW(String username, String password) {
 		String encrytedPW = appService.getEncryptPassword(password);
@@ -617,12 +685,12 @@ public class AppController {
 		System.out.println(decrytedPW);
 		userService.updatePassword(username, encrytedPW);
 	}
-	
+
 	@SuppressWarnings("unused")
 	private void addNewAdmin() {
-		
-	}	
-	
+
+	}
+
 	@Autowired
 	TestSQLDAO testSQLDAO;
 

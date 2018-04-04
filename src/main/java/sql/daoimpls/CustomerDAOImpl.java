@@ -117,4 +117,32 @@ public class CustomerDAOImpl extends APIDAO implements CustomerDAO {
 				});
 		return dateVisits;
 	}
+	
+	private void changStatusUser(String username, String status) {
+		callAPI(APIData.STATUS_USER_IP_API + status + "/" + username);
+	}
+
+	@Override
+	public void blockUser(String username) {
+		changStatusUser(username, "Blocked");
+		
+	}
+
+	@Override
+	public void unblockUser(String username) {
+		changStatusUser(username, "Valid");
+		
+	}
+
+	@Override
+	public List<Customer> getAllBlockedCustomers() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Customer> getAllValidCustomers() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

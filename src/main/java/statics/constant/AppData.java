@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import model.mongodb.user.Customer;
 import model.sql.hotel.HotelRoom;
 import model.sql.hotel.HotelService;
 import model.sql.user.Administrator;
@@ -19,26 +20,77 @@ import model.sql.user.Administrator;
  */
 
 public class AppData {
-
-	// local
-	//public static final String SPRING_APP_URL = "http://localhost:8080/Hotel-booking-and-reservations-system-admin/";
-
-	// for using mongodb with Spring instead of using Hibernate + SQL 
-	//local
-//	public static final String DATABASE = "HotelBookingReservationsSystem";
-//	public static final String DATABASE_HOST = "localhost";
-//	public static final int DATABASE_PORT = 27017;
-//	public static final String MONGGO_URL = "mongodb://" + AppData.DATABASE_HOST + ":" + AppData.DATABASE_PORT;
-
-	// online
-	//public static final String SPRING_APP_URL = "https://admin-hotel-booking.herokuapp.com/";
 	
-	// online v1
-	public static final String SPRING_APP_URL = "https://admin-hotel-booking-v1.herokuapp.com/";
 	
-	//online
-	public static final String DATABASE = "hotel_booking_system";
-	public static final String MONGGO_URL = "mongodb://dohungcuongdev:ititiu13170@ds157057.mlab.com:57057/" + DATABASE;
+	/* change server config here */
+	// public static final String SERVER_CONFIGURATION = "custom";
+	// public static final String SERVER_CONFIGURATION = "localhost:3000";
+	// public static final String SERVER_CONFIGURATION = "localhost:3000 & localhost:8080";
+	// public static final String SERVER_CONFIGURATION = "https://hotel-booking-and-reservations.herokuapp.com";
+	public static final String SERVER_CONFIGURATION = "https://hotel-booking-system-v1.herokuapp.com";
+	// public static final String SERVER_CONFIGURATION = "https://hotel-booking-system-v2.herokuapp.com";
+	
+	
+	/* change database config here */
+	// public static final String DB_CONFIGURATION = "local";
+	public static final String DB_CONFIGURATION = "mlab";
+	
+	public static String SPRING_APP_URL;
+	public static String MEAN_URL;
+	public static String MONGGO_URL;
+	public static String DATABASE;
+	
+	static {
+		switch (SERVER_CONFIGURATION) {
+		
+		case "custom":
+			/* change your custom server config here */
+			MEAN_URL = "https://localhost:3000/";
+			SPRING_APP_URL = "https://admin-hotel-booking-v1.herokuapp.com/";
+			break;
+			
+		case "localhost:3000":
+			MEAN_URL = "https://localhost:3000/";
+			SPRING_APP_URL = "https://localhost:3000/";
+			break;
+			
+		case "localhost:3000 & localhost:8080":
+			MEAN_URL = "https://localhost:3000/";
+			SPRING_APP_URL = "http://localhost:8080/Hotel-booking-and-reservations-system-admin/";
+			break;
+			
+		case "https://hotel-booking-and-reservations.herokuapp.com":
+			MEAN_URL = "https://hotel-booking-and-reservations.herokuapp.com/";
+			SPRING_APP_URL = "https://admin-hotel-booking.herokuapp.com/";
+			break;
+			
+		case "https://hotel-booking-system-v1.herokuapp.com":
+			MEAN_URL = "https://hotel-booking-system-v1.herokuapp.com/";
+			SPRING_APP_URL = "https://admin-hotel-booking-v1.herokuapp.com/";
+			break;
+		case "https://hotel-booking-system-v2.herokuapp.com":
+			MEAN_URL = "https://hotel-booking-system-v2.herokuapp.com/";
+			SPRING_APP_URL = "https://admin-hotel-booking-v1.herokuapp.com/";
+			break;
+			
+		default:
+			break;
+		}
+		
+		if(DB_CONFIGURATION.equals("local")) {
+				DATABASE = "HotelBookingReservationsSystem";
+				String DATABASE_HOST = "localhost";
+				int DATABASE_PORT = 27017;
+				MONGGO_URL = "mongodb://" + DATABASE_HOST + ":" + DATABASE_PORT;
+		}
+		
+		if(DB_CONFIGURATION.equals("mlab")) {
+				DATABASE = "hotel_booking_system";
+				MONGGO_URL = "mongodb://dohungcuongdev:ititiu13170@ds157057.mlab.com:57057/" + DATABASE;
+		}
+	}
+
+
 			
 	public static final String EMAIL = "cuongvip1295@gmail.com";
 	public static final String AUTHENTICATION = "ititiu13170";
@@ -54,7 +106,7 @@ public class AppData {
 	public static final String FORGET_PW_HEADER_EMAIL = "Dear User,<br><br>Your password have been changed to <b style='color:blue'>";
 	public static final String FORGET_PW_FOOTER_EMAIL = "<br><br>Please click here to change your password <a href='"
 			+ SPRING_APP_URL
-			+ "'>Holiday Crown Hotel Admin</a><br><br>With best regards,<br> Hung Cuong.<br><br><b>Holiday Crown.</b><br>Address: 24 Street 7, Bình An Ward, District 2.<br>Phone Number: 0908998923.<br>Hotline: (08).3740480";
+			+ "'>Marina Meepo Hotel Admin</a><br><br>With best regards,<br> Hung Cuong.<br><br><b>Marina Meepo.</b><br>Address: 24 Street 7, Bình An Ward, District 2.<br>Phone Number: 0908998923.<br>Hotline: (08).3740480";
 	public static final String EMAIL_NO_SUBJECT_MES = "Please input subject and message!";
 	public static final String INFOR_NOT_ENOUGH = "Please input all the information!";
 	public static final String WRONG_ROOM_NAME = "Room name must be 3 digits natural number! (Ex: 604)";
@@ -93,10 +145,11 @@ public class AppData {
 			"room-pictures-delightful-livingfamily-room-aaron-design-and-build-inc.jpg", };
 	public static final String RESTAURANT_DEFAULT_IMG[] = { "pizza.jpg", "pizza_2.jpg", };
 	public static final String EMAIL_TEMPLATE_1[] = { "",
-			"Dear Mr. Đỗ Hùng Cường, &#13;&#13;Thank you for your interest in our hotel. This email is to acknowledge the receipt of your email and thank you for sending us your request. We will carefully review your request. Should your request match our ability, we will contact you soon. In other cases, we will keep the request for future opportunities.&#13;&#13;With best regards, &#13Hùng Cường.&#13&#13...&#13Holiday Crown.&#13Address: 24 Street 7, Bình An Ward, District 2.&#13Phone Number: 0908998923.&#13Hotline: (08).37404802.",
-			"Dear Mr. Đỗ Hùng Cường, &#13;&#13;Thank you for your interest in our hotel. This email is to acknowledge the receipt of your email and thank you for sending us your request. We will carefully review your request. Should your request match our ability, we will contact you soon. In other cases, we will keep the request for future opportunities.&#13;&#13;With best regards, &#13Hùng Cường.&#13&#13...&#13Holiday Crown.&#13Address: 24 Street 7, Bình An Ward, District 2.&#13Phone Number: 0908998923.&#13Hotline: (08).37404802." };
+			"Dear Mr. Đỗ Hùng Cường, &#13;&#13;Thank you for your interest in our hotel. This email is to acknowledge the receipt of your email and thank you for sending us your request. We will carefully review your request. Should your request match our ability, we will contact you soon. In other cases, we will keep the request for future opportunities.&#13;&#13;With best regards, &#13Hùng Cường.&#13&#13...&#13Marina Meepo.&#13Address: 24 Street 7, Bình An Ward, District 2.&#13Phone Number: 0908998923.&#13Hotline: (08).37404802.",
+			"Dear Mr. Đỗ Hùng Cường, &#13;&#13;Thank you for your interest in our hotel. This email is to acknowledge the receipt of your email and thank you for sending us your request. We will carefully review your request. Should your request match our ability, we will contact you soon. In other cases, we will keep the request for future opportunities.&#13;&#13;With best regards, &#13Hùng Cường.&#13&#13...&#13Marina Meepo.&#13Address: 24 Street 7, Bình An Ward, District 2.&#13Phone Number: 0908998923.&#13Hotline: (08).37404802." };
 
 	public static Administrator admin = new Administrator();
 	public static List<HotelRoom> listrooms = new ArrayList<>();
 	public static List<HotelService> listservices = new ArrayList<>();
+	public static List<Customer> listcustomers = new ArrayList<>();
 }

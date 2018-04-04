@@ -51,7 +51,7 @@ public class TestSQLDAO {
 	public Object dataDisplayOnWeb() {
 		
 		// return data to show on web here
-		return customerDAO.getOneDataCollection("cuongvip1295@gmail.com.vn"); 
+		return roomDAO.getRoomByID(1);
 	}
 	
 	public static void main (String args[]) {
